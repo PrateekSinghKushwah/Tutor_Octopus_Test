@@ -36,13 +36,32 @@ router.post('/login', async (req, res) => {
 //****when user hits register button, this api is called***
 //*REGISTER_API
 router.post('/register', async (req,res)=>{
-    let user = new Educator_info({
+
+    //getting the data and validating it.
+    let data={
         Fname: req.body.Fname,
         Lname: req.body.Lname,
         email: req.body.email,
         passwordHash: bcrypt.hashSync(req.body.password, 10),
        BusinessName: req.body.BusinessName,
-    })
+    }
+    //looping over the data so as to validate it.
+    //
+    for (const [key, value] of Object.entries(data)) {
+        console.log(key);
+        if(value.length===0)
+        {
+            return res.send(key ," is missing")
+        }
+      
+        var emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if( key==="email" && !emailRegex.test(data.email))
+        {
+            return res.send(key +" is not valid")
+        }
+        //if more data_validation is needed . we can add here
+    }
+    let user = new Educator_info(data)
     user = await user.save();
 
     if(!user)
